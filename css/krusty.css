@@ -1,0 +1,21 @@
+.bgImage{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+.playIcon{
+	background-image: url('../img/play.png');
+	background-size: 80px 80px;
+	width: 80px;
+	height: 80px;
+	position: absolute;
+	z-index: 3;
+}
+video{
+	background-color: black;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}

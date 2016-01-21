@@ -1,0 +1,1 @@
+define([],function(){var a={};a.getRandomInt=function(c,b){return Math.floor(Math.random()*(b-c+1))+c};return a});

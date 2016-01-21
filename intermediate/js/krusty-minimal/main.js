@@ -1,0 +1,1 @@
+require(["libs/util/Url","app/jquery.krusty-minimal"],function(a){$(document).ready(function(){var b=a.getUrlVars();$(".presentation").krusty(b)})});

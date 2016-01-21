@@ -1,0 +1,1 @@
+define([],function(){var a={};a.getUrlVars=function(){var e={},d;var b=window.location.href.slice(window.location.href.indexOf("?")+1).split("&");for(var c=0;c<b.length;c++){d=b[c].split("=");e[d[0]]=d[1]}return e};return a});

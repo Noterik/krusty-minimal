@@ -48,7 +48,7 @@ define([
 			'type': 'POST',
 			'accepts' : 'text/xml',
 			'contentType' : 'text/xml',
-			'data' : "<fsxml mimetype='application/fscommand' id='dynamic'><properties><handler>/dynamic/presentation/playout/flash</handler></properties></fsxml>"
+			'data' : "<fsxml mimetype='application/fscommand' id='dynamic'><properties><handler>/dynamic/presentation/playout/html5</handler></properties></fsxml>"
 		}
 
 		/**

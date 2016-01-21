@@ -53,14 +53,8 @@ define([], function() {
 
             //Get the mount where we can find the video.
             var mount = rawVideo.find('mount').text().split(',')[0];
-            codec.src = 'http://' + mount + '.noterik.com/progressive/' + mount + referVid.attr('fullid') + '/rawvideo/' + rawVideo.attr('id') + '/raw.mp4';
+            codec.src = 'http://streaming11.dans.knaw.nl/rafael/' + referVid.attr('fullid') + '/rawvideo/' + rawVideo.attr('id') + '/'+ rawVideo.find('filename').text();
             var fullId = referVid.attr('fullid');
-            if (codec.type == "video/mp4") {
-              if (fullId.charAt(0) == "/") {
-                fullId = fullId.substring(1);
-              }
-              codec.streamSrc = "http://" + mount + ".noterik.com/" + mount + "/_definst_/mp4:" + fullId + "/rawvideo/" + rawVideo.attr('id') + "/raw.mp4/playlist.m3u8";
-            }
 
             //Add the codec to the source.
             source.codecs.push(codec);
@@ -77,6 +71,7 @@ define([], function() {
       var referVid = $(data.find('fsxml > video[fullid|="' + video.attr('referid') + '"]'));
       var screenshotElement = referVid.find('screens');
       var uri = screenshotElement.find('properties > uri').text();
+      uri = uri.replace(".noterik.com", "streaming11.dans.knaw.nl/stills");
       var screenshotTime = Math.floor(parseInt(referVid.find('rawvideo[id=1] > properties > duration').text()) / 2);
       var hours = Math.floor(screenshotTime / 3600);
       var minutes = Math.floor((screenshotTime % 3600) / 60);

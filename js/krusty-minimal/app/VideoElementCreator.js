@@ -35,32 +35,8 @@ define(['libs/jquery.browser.mobile'], function() {
     };
 
     var getWantedSource = function() {
-      var currentSource = null;
-      if (settings.videos.length > 1) {
-				if(settings.quality){
-					var sources = $.grep(settings.videos, function(v){
-						if(v.quality === settings.quality){
-							return v;
-						}
-					});
-					currentSource = sources[0];
-				}else{
-	        $.each(settings.currentOrder, function(key, quality) {
-	          currentSource = $.grep(settings.videos, function(v) {
-	            if (v.quality == quality) {
-	              return v;
-	            }
-	          });
-	          if (currentSource.length > 0) {
-	            currentSource = currentSource[0];
-	            return false;
-	          }
-	        });
-				}
-      } else {
-        currentSource = settings.videos[0];
-      }
-
+      currentSource = settings.videos[settings.videos.length-1];
+     
       return currentSource;
     };
 

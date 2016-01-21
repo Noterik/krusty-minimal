@@ -1,1 +1,1 @@
-define(["libs/util/Rand",],function(a){function b(d){var c=this;var e={bartURI:"http://bart%number%.noterik.com/bart/",bart:a.getRandomInt(1,3)};this.request=function(f){f.url=e.bartURI+f.url;$.ajax(f)};$.extend(e,d);e.bartURI=e.bartURI.replace("%number%",e.bart);return c}return b});
+define(["libs/util/Rand",],function(a){function b(d){var c=this;var e={bartURI:"http://streaming11.dans.knaw.nl/bart/",};this.request=function(f){f.url=e.bartURI+f.url;$.ajax(f)};$.extend(e,d);return c}return b});

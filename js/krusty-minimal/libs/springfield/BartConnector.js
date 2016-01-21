@@ -23,21 +23,13 @@ define([
 		 */
 		var settings = {
 			/**
-			 * Contains the start of the URI to which the request will be requested. The %number% will be replaced by the bart attribute.
+			 * Contains the start of the URI to which the request will be requested.
 			 *
 			 * @property settings.bartURI
 			 * @type String
-			 * @default 'http://bart%number%.noterik.com/bart/'
+			 * @default 'http://streaming11.dans.knaw.nl/bart/'
 			 */
-			bartURI: 'http://bart%number%.noterik.com/bart/',
-			/**
-			 * Contains the number of the bart server to which will requested. By default this is a value between 1 and 3.
-			 *
-			 * @property settings.bart
-			 * @type Integer
-			 * @default Random integer between 1 and 3.
-			 */
-			bart: Rand.getRandomInt(1, 3)
+			bartURI: 'http://streaming11.dans.knaw.nl/bart/',
 		};
 
 		/**
@@ -53,7 +45,6 @@ define([
 		};
 
 		$.extend(settings, options);
-		settings.bartURI = settings.bartURI.replace('%number%', settings.bart);
 
 		return self;
 	}

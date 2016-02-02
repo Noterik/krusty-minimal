@@ -15,18 +15,26 @@ define([], function() {
 
     function parseSources() {
       var data = $(settings.data);
-
+       
       //Go through all video's in the videoplaylist in the response, and parse them into PlaylistItem objects.
-      var video = data.find('presentation > videoplaylist').first().find('video').first();
-      var referVid = $(data.find('fsxml > video[fullid|="' + video.attr('referid') + '"]'));
+      var videos = data.find('presentation > videoplaylist').first().find('video');
+      
+      var videoSources = [];
+      
+      //for (var counter = 0; counter < videos.length; counter++) {
+      
+      $.each(videos, function(counter, video){
+      var referVid = $(data.find('fsxml > video[fullid|="' + $(video).attr('referid') + '"]'));
       var sources = [];
-
+     
+      
       if (referVid.children('rawvideo').length > 0) {
         $.each(referVid.children('rawvideo'), function(key, rawVideo) {
           rawVideo = $(rawVideo);
           //Only use video's that are not the original and which have a wantedheight defined.
           if ((!rawVideo.find('original').text() && rawVideo.find('wantedheight').text()) !== "" || referVid.children('rawvideo').length === 1) {
             var add = false;
+            
             //Check if there is already a source defined with the given wantedheight, if there is skip it, otherwise there will be duplicates.
             var source = $.grep(sources, function(source) {
               return source.quality == (rawVideo.find('wantedheight').text());
@@ -38,7 +46,6 @@ define([], function() {
 
             //Set the String by which we can retrieve the quality. Add a p behind the height, so that 360 become 360p.
             source.quality = rawVideo.find('height').text() + "p";
-
             //Set the codecs available for the source.
             if (source.codecs === undefined)
               source.codecs = [];
@@ -50,19 +57,22 @@ define([], function() {
               case 'mp4':
                 codec.type = 'video/mp4';
             }
-
+            
             //Get the mount where we can find the video.
             var mount = rawVideo.find('mount').text().split(',')[0];
             codec.src = 'http://streaming11.dans.knaw.nl/rafael/' + referVid.attr('fullid') + '/rawvideo/' + rawVideo.attr('id') + '/'+ rawVideo.find('filename').text();
             var fullId = referVid.attr('fullid');
-
+            
             //Add the codec to the source.
             source.codecs.push(codec);
             sources.push(source);
           }
         });
       }
-      settings.sources = sources;
+      //settings.sources = sources;
+      videoSources[counter] = sources;
+      });
+      console.log(videoSources);
     }
 
     function parseScreenshot() {

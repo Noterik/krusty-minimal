@@ -45,12 +45,12 @@ define([
 			init: function(options){
 				var self = this;
 				var qc = QuickstartConnector({
-					'uri': options.uri,
+					'uri': options.uri,					
 					'success': function(data){
 						var parser = QSResponseParser({data:data});
-						var videos = parser.getSources();
+						var videos = parser.getVideos();
 						var screenshot = parser.getScreenshot();
-						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality});
+						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket});
 						element = creator.create();
 						listenToEvents(self, element);
 						element.width($(self)[0].clientWidth);

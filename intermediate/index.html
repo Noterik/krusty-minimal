@@ -22,24 +22,24 @@
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
   <!-- CSS: implied media=all -->
-  <link rel='stylesheet' href='css/ce4e707365f2543f805ec7cf07ff995c41131a3a.css'>
+  <link rel='stylesheet' href='css/58cffd79f34db68bbf58509fca307f05ce45e139.css'>
 
   <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 </head>
 
-<body>
-  <div id="container">
-    <header>
-
-    </header>
-    <div id="main" role="main">
-		<div class="presentation" style="width: 640px; height: 320px;"></div>
+<body role="main" class="videoplayer">
+	<div id="controls">
+		<div id="play-pause"><span class="fa fa-play fa-lg"></span></div>
+		<div id="fullscreen"><span class="fa fa-expand fa-lg"></span></div>
+		<input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">
+		<div id="mute-unmute"><span class="fa fa-volume-up fa-lg"></span></div>
+		<div id="time">
+			<div id="totaltime" class="time-text">--:--</div>
+			<div class="time-text time-seperator"> / </div>
+			<div id="playtime" class="time-text">--:--</div>
+		</div>
+		<input type="range" id="seek-bar" value="0" min="0" step="1">
     </div>
-    <footer>
-
-    </footer>
-  </div> <!--! end of #container -->
-
 
   <!-- JavaScript at the bottom for fast page loading -->
 

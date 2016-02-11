@@ -1,4 +1,8 @@
-define([], function() {
+define([
+  'config/BaseConfig',
+], function(
+  BaseConfig
+) {
   var QSResponseParser = function(options) {
     var self = {};
     var settings = {
@@ -67,7 +71,7 @@ define([], function() {
 	            
 	            //Get the mount where we can find the video.
 	            var mount = rawVideo.find('mount').text().split(',')[0];
-	            codec.src = 'http://streaming11.dans.knaw.nl/rafael/' + referVid.attr('fullid') + '/rawvideo/' + rawVideo.attr('id') + '/'+ rawVideo.find('filename').text();
+	            codec.src = BaseConfig.baseURI+'/rafael/' + referVid.attr('fullid') + '/rawvideo/' + rawVideo.attr('id') + '/'+ rawVideo.find('filename').text();
 	            var fullId = referVid.attr('fullid');
 	            
 	            //Add the codec to the source.
@@ -76,6 +80,7 @@ define([], function() {
 	            
 	            //we need the duration to calculate the total duration, duration is in seconds, convert to miliseconds
 	            duration = rawVideo.find('duration').text() !== "" ? parseFloat(rawVideo.find('duration').text()) * 1000 : duration;
+	            v.oduration = duration;
 	          }
 	        });
 	      }
@@ -92,7 +97,7 @@ define([], function() {
       var referVid = $(data.find('fsxml > video[fullid|="' + video.attr('referid') + '"]'));
       var screenshotElement = referVid.find('screens');
       var uri = screenshotElement.find('properties > uri').text();
-      uri = uri.replace(".noterik.com", "streaming11.dans.knaw.nl/stills");
+      uri = uri.replace(".noterik.com", BaseConfig.baseURI+"/stills");
       //var screenshotTime = Math.floor(parseInt(referVid.find('rawvideo[id=1] > properties > duration').text()) / 2);
       var screenshotTime =  Math.floor(parseInt(starttime) / 1000) + 10;
       var hours = Math.floor(screenshotTime / 3600);

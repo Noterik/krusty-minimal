@@ -6,6 +6,6 @@ require([
 ){
 	$(document).ready(function(){
 		var vars = Url.getUrlVars();
-		$('.presentation').krusty(vars);
+		$('.videoplayer').krusty(vars);
 	});
 });

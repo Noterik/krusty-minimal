@@ -1,1 +1,1 @@
-define(["libs/util/Rand",],function(a){function b(d){var c=this;var e={bartURI:"http://streaming11.dans.knaw.nl/bart/",};this.request=function(f){f.url=e.bartURI+f.url;$.ajax(f)};$.extend(e,d);return c}return b});
+define(["libs/util/Rand","config/BaseConfig",],function(b,a){function c(e){var d=this;var f={bartURI:a.baseURI+"/bart/",};this.request=function(g){g.url=f.bartURI+g.url;$.ajax(g)};$.extend(f,e);return d}return c});

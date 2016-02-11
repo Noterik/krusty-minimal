@@ -1,7 +1,9 @@
 define([
 	'libs/util/Rand',
+	'config/BaseConfig',
 ], function(
-	Rand
+	Rand,
+	BaseConfig
 ){
 	/**
 	 * Class to connect to the bart servers.
@@ -13,7 +15,7 @@ define([
 	 * @constructor
 	 */
 	function BartConnector(options){
-
+		
 		var self = this;
 		/**
 		 * Contains the default settings.
@@ -23,13 +25,12 @@ define([
 		 */
 		var settings = {
 			/**
-			 * Contains the start of the URI to which the request will be requested.
+			 * Contains the start of the URI to which the requests will be requested.
 			 *
 			 * @property settings.bartURI
 			 * @type String
-			 * @default 'http://streaming11.dans.knaw.nl/bart/'
 			 */
-			bartURI: 'http://streaming11.dans.knaw.nl/bart/',
+			bartURI: BaseConfig.baseURI+'/bart/',
 		};
 
 		/**

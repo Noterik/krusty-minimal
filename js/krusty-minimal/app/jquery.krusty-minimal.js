@@ -74,6 +74,8 @@ define([
 						$(self).append(playIcon);
 						playIcon.css('left', ((element.width() / 2) - (playIcon.width() / 2)) + "px");
 						playIcon.css('top', ((element.height() / 2) - (playIcon.height() / 2)) + "px");
+						
+						$("#seek-bar").css('width', ($("#videoplayer").width() - 325) +"px");
 					}
 				});
 			},

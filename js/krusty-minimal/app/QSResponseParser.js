@@ -33,6 +33,8 @@ define([
 	      //Starttime and duration set are in ms
 	      v.starttime = !$(video).find('starttime').text() ? 0.0 : parseFloat($(video).find('starttime').text()); 
 	      v.duration = !$(video).find('duration').text() ? -1.0 : parseFloat($(video).find('duration').text()); 
+	      v.subtitles = !$(video).find('webvtt').text() ? undefined : BaseConfig.baseURI+'/subtitles'+ referVid.attr('fullid') +"/"+ $(video).find('webvtt').text(); 
+
 	      v.position = k;
 	      v.sources = [];
 	      

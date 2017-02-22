@@ -37,6 +37,18 @@ define(['libs/jquery.browser.mobile'], function() {
       source.attr('type', codec.type);
       video.append(source);
       
+      var subtitles = getSubtitles;
+      if (subtitles !== undefined) {
+    	  $("#subtitles").show();
+    	  
+    	  var track = $(document.createElement("track"));
+    	  track.attr('src', subtitles);
+          track.attr('kind', 'subtitles');
+          video.append(track);
+      } else {
+    	  $("#subtitles").hide();
+      }
+
       video.on('ended', function() {
     	  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
     	  
@@ -185,6 +197,10 @@ define(['libs/jquery.browser.mobile'], function() {
     	  toggleFullScreen();
       });
       
+      $("#subtitles").click(function() {
+    	 toggleSubtitles(); 
+      });
+      
       $(window).on('resize', function() {
     	  video.width($("#videoplayer").parent().width());
     	  video.height($("#videoplayer").parent().height());
@@ -217,6 +233,10 @@ define(['libs/jquery.browser.mobile'], function() {
     	return query;    	
     };
     
+    var getSubtitles = function() {
+    	return settings.videos[settings.currentItem].subtitles;
+    }
+    
     var loadVideo = function(video) {
     	var s = getWantedSource();
     	  var codec = getWantedCodec(s.codecs, "video/mp4");
@@ -234,6 +254,15 @@ define(['libs/jquery.browser.mobile'], function() {
     	  }
     	  
     	  video.children('source').first().attr('src', codec.src+getQueryString());
+    	  
+    	  var subtitles = getSubtitles();
+    	  if (subtitles != undefined) {
+    		  $("#subtitles").show();
+    		  video.children('track').first().attr('src', subtitles);
+    	  } else {
+    		  $("#subtitles").hide();
+    	  }
+    	  
     	  video.load();
     };
 
@@ -277,6 +306,16 @@ function toggleFullScreen() {
 		}
 		$("#fullscreen > span").addClass("fa-expand");
   	  	$("#fullscreen > span").removeClass("fa-compress");
+	}
+}
+
+function toggleSubtitles(video) {
+	var video = document.getElementById("videoplayer");
+
+	if (video.textTracks[0].mode == "showing") {
+		video.textTracks[0].mode = "hidden";
+	} else {
+		video.textTracks[0].mode = "showing";
 	}
 }
 

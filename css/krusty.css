@@ -91,6 +91,17 @@ video{
 	cursor: pointer;
 }
 
+#subtitles {
+	display: none;
+	float: right;
+	width: 20px;
+	padding: 5px;
+}
+
+#subtitles:hover {
+	cursor: pointer;
+}
+
 #mute-unmute {
 	float: right;
 	width: 20px;

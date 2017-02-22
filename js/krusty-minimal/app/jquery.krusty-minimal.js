@@ -50,7 +50,7 @@ define([
 						var parser = QSResponseParser({data:data});
 						var videos = parser.getVideos();
 						var screenshot = parser.getScreenshot();
-						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket});
+						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket, 'startTime': Number(options.start)});
 						element = creator.create();
 						listenToEvents(self, element);
 						element.width($(self)[0].clientWidth);

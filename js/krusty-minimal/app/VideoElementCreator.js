@@ -1,4 +1,8 @@
-define(['libs/jquery.browser.mobile'], function() {
+define([
+        'libs/jquery.browser.mobile',
+        'config/BaseConfig',
+        'app/ChapterElementCreator',
+], function(JQueryBrowserMobile, BaseConfig, ChapterElementCreator){
   var VideoElementCreator = function(options) {
     var self = {};
     var settings = {
@@ -12,7 +16,8 @@ define(['libs/jquery.browser.mobile'], function() {
       },
       'ticket': null,
       wasPlaying: false,
-      seekTime: -1
+      seekTime: -1,
+      startTime: null
     };
     var tempVolume = 0;
     var prevItemsTime = 0;
@@ -23,6 +28,35 @@ define(['libs/jquery.browser.mobile'], function() {
       var video = $(document.createElement("video"));
       video.attr('id', 'videoplayer');
 
+      //autoplay option from baseconfig
+      if (BaseConfig.autoplay) {
+		  video.attr('autoplay', 'autoplay');
+      }
+      
+      //check if we have a specific time set to start this video
+      if (settings.startTime != null) {
+    	 var seektime = settings.startTime;
+      
+    	  for (var i = 0; i < settings.videos.length; i++) {
+    		  seektime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+    		  if (seektime < 0) {
+    			  //ok, we found the correct video, correct seektime for this video
+    			  seektime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+
+				  settings.currentItem = i;
+				  //set global seektime for if the new video is loaded
+				  settings.seekTime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + seektime : seektime;
+				 
+				  prevItemsTime = 0;
+				  
+				  for (var i = 0; i < settings.currentItem; i++) {
+	    			  prevItemsTime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+	    		  }				  
+				  break;
+    		  }
+    	  }
+      }    
+      
       var source = getWantedSource(settings);
       var codec = getWantedCodec(source.codecs, "video/mp4");
       if (codec.streamSrc !== undefined) {
@@ -35,6 +69,11 @@ define(['libs/jquery.browser.mobile'], function() {
       source = $(document.createElement("source"));
       source.attr('src', codec.src+getQueryString());
       source.attr('type', codec.type);
+      
+      video[0].addEventListener('error', function() {
+    	 $("body").append("<div class='error'>You don't have valid credentials to play this video.</div>");
+      });
+      
       video.append(source);
       
       video.on('ended', function() {
@@ -46,6 +85,11 @@ define(['libs/jquery.browser.mobile'], function() {
       $("#seek-bar").attr("max", settings.videos.duration);
       $("#playtime").text(formatTime(0));
       $("#totaltime").text(formatTime(settings.videos.duration/1000));
+      
+      if (BaseConfig.chapterInfo) {
+    	  var creator = ChapterElementCreator({});
+    	  element = creator.create();
+      }
       
       video.on('play', function() {
     	  $("#play-pause > span").addClass("fa-pause");
@@ -221,10 +265,14 @@ define(['libs/jquery.browser.mobile'], function() {
     	var s = getWantedSource();
     	  var codec = getWantedCodec(s.codecs, "video/mp4");
 
+    	  prevItemsTime = 0;
+    	  
     	  //only continue playing when in a playlist
     	  if (settings.currentItem == 0) {
+    		  //end of playlist, pause
     		  video.removeAttr('autoplay');
-    		  prevItemsTime = 0;
+    		  $("#play-pause > span").addClass("fa-play");
+    		  $("#play-pause > span").removeClass("fa-pause");
     	  } else {
     		  video.attr('autoplay', 'autoplay');
     		  

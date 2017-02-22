@@ -1,1 +1,1 @@
-define([],function(){var a={};a.baseURI="http://streaming11.dans.knaw.nl";return a});
+define([],function(){var a={};a.baseURI="http://bart1.noterik.com";a.streamURI=".noterik.com/progressive/";a.autoplay=true;return a});

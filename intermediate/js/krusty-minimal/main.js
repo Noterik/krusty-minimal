@@ -1,1 +1,1 @@
-require(["libs/util/Url","app/jquery.krusty-minimal"],function(a){$(document).ready(function(){var b=a.getUrlVars();$(".videoplayer").krusty(b)})});
+require(["libs/util/Url","app/jquery.krusty-minimal"],function(a){$(document).ready(function(){var b=a.getUrlVars();console.log("vars");console.log(b);$(".videoplayer").krusty(b)})});

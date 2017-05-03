@@ -115,3 +115,151 @@ button:hover {
 	width: 60px;
 	margin-top: 5px;
 }
+
+#chapters {
+	float: right;
+	width: 20px;
+	padding: 5px;
+}
+
+#chapters:hover {
+	cursor: pointer;
+}
+
+.chapters_font {
+	font-family: Helvetica Light, Helveticaneue Light, Calibri Light,  Helveticaneue, Helvetica, Gill Sans, Myriad Pro, Arial, Lucida Grande, sans-serif;
+}
+
+#chapterinfo {
+	position: absolute;
+	top: 0;
+	margin-top: 2vh;
+	margin-left: 2vh;	
+	width: 50%;
+	height: 54px;
+	background:rgba(0,0,0,0.5);
+	border: 1px solid #3C3C3C;
+	z-index: 999;
+}
+
+#chapterinfo:hover {
+	cursor: pointer;	
+}
+
+.currentchapter {
+	position: relative;
+	width: 100%;
+	height: 27px;
+	font-size: 15px;
+	color: #fff;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+	padding: 6px;
+	box-sizing: border-box;
+}
+
+#currentchapter_heading {
+	border-bottom: 1px solid #3C3C3C;
+}
+
+#currrentchapter_heading_plus {
+	float:right;
+	width: 1em;
+	height: 1em;
+	line-height: 1em;
+}
+
+#plusbackground {
+	color: #3C3C3C;
+	font-size: 1em;
+}
+
+.plussign {
+	color: #000;
+}
+
+#allchapters {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;	
+	width: 90%;
+	height: 80%;
+	background:rgba(0,0,0,0.8);
+	border: 1px solid #3C3C3C;
+	z-index: 999;
+	overflow-y: auto;
+}
+
+.allchaptersheaderbackground {
+	background: rgba(26, 26, 26, 1);
+}
+
+.closesign {
+	color: #000;
+	font-size: 0.9em;
+	font-weight: 700;
+}
+
+.closesign:hover {
+	cursor: pointer;
+}
+
+#allchapterstable {
+	color: #fff;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.chapternumber {
+	width: 10%;
+}
+
+.chaptertitle {
+	width: 75%;
+}
+
+.chaptertitle:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.readmore {
+	width: 15%;
+}
+
+.readmore:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.allchapters_currentchapter {
+	color: #439bdd;
+}
+
+#chaptertitle {
+	color: #fff;
+	font-size: 18px;
+	border-bottom: 1px solid #3C3C3C;
+	padding: 10px;
+}
+
+#returnbutton {
+	float: right;
+	border-radius: 5px;
+	border: 1px solid #3C3C3C;
+	background: rgba(26, 26, 26, 1);
+	color: #fff;
+	font-size: 15px;
+}
+
+#returnbutton:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+#chapterbody {
+	color: #fff;
+	padding: 8px;
+}

@@ -7,6 +7,7 @@ define([
     var self = {};
     var settings = {
       'videos': null,
+      'chapters': null,
 	  'quality': '360p',
       'currentOrder': null,
       'currentItem': 0,
@@ -87,8 +88,10 @@ define([
       $("#totaltime").text(formatTime(settings.videos.duration/1000));
       
       if (BaseConfig.chapterInfo) {
-    	  var creator = ChapterElementCreator({});
+    	  var creator = ChapterElementCreator({'chapters': settings.chapters});
     	  element = creator.create();
+    	  
+    	  $(".videoplayer").append(element);
       }
       
       video.on('play', function() {
@@ -114,6 +117,10 @@ define([
     		  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
         	  
     		  loadVideo(video);
+    	  }
+    	  
+    	  if (BaseConfig.chapterInfo) {
+    		  creator.timeupdate(prevItemsTime+correctedTime);
     	  }
       });
       
@@ -229,6 +236,10 @@ define([
     	  toggleFullScreen();
       });
       
+      $("#chapters").click(function() {
+    	 toggleChapterInformation(); 
+      });
+      
       $(window).on('resize', function() {
     	  video.width($("#videoplayer").parent().width());
     	  video.height($("#videoplayer").parent().height());
@@ -236,7 +247,7 @@ define([
     	  $(".playIcon").css('left', (($("#videoplayer").width() / 2) - ($(".playIcon").width() / 2)) +"px");
     	  $(".playIcon").css('top', (($("#videoplayer").height() / 2) - ($(".playIcon").height() / 2)) +"px");
     	  
-    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - 325) +"px");
+    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - 350) +"px");
       });
 
       return video;
@@ -352,4 +363,15 @@ function formatTime(time) {
 	formattedTime += seconds;
 	
 	return formattedTime;
+}
+
+function toggleChapterInformation() {
+	if ($("#chapterinfo").is(":visible") || $("#allchapters").is(":visible")) {
+		$("#chapterinfo").hide();
+		$("#allchapters").remove();
+		$("#chapters > span").removeClass("fa-inverse");  	  	
+	} else {
+		$("#chapterinfo").show();
+		$("#chapters > span").addClass("fa-inverse");
+	}
 }

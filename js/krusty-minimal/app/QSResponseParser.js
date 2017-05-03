@@ -8,7 +8,8 @@ define([
     var settings = {
       data: null,
       videos: null,
-      screenshot: null
+      screenshot: null,
+      chapters: null
     };
     $.extend(settings, options);
 
@@ -94,6 +95,28 @@ define([
 	      videos.duration = v.duration == -1 ? videos.duration + duration : videos.duration + v.duration;
       });
       settings.videos = videos;
+      
+      var playlistChapters = data.find('presentation > videoplaylist').first().find('chapter');
+      var chapters = [];
+            
+      $.each(playlistChapters, function(k, chapter) {    	  
+    	  var c = {};
+    	  
+    	  c.starttime = !$(chapter).find('starttime').text() ? 0.0 : parseFloat($(chapter).find('starttime').text()); 
+	      c.duration = !$(chapter).find('duration').text() ? -1.0 : parseFloat($(chapter).find('duration').text()); 
+
+	      c.title = $(chapter).find('title').text();
+	      c.description = $(chapter).find('description').text();
+	      
+	      chapters[k] = c;
+      });
+      
+      //sort chapters based on their starttime
+      chapters.sort(function(a, b) {
+			return  parseFloat(a.starttime) - parseFloat(b.starttime);
+		});	
+      
+      settings.chapters = chapters;
     }
 
     function parseScreenshot() {
@@ -103,7 +126,7 @@ define([
       var referVid = $(data.find('fsxml > video[fullid|="' + video.attr('referid') + '"]'));
       var screenshotElement = referVid.find('screens');
       var uri = screenshotElement.find('properties > uri').text();
-      uri = uri.replace("http://.noterik.com", BaseConfig.baseURI+"/stills");
+      uri = uri.replace("http://.noterik.com", BaseConfig.baseURI+"/data");
       //var screenshotTime = Math.floor(parseInt(referVid.find('rawvideo[id=1] > properties > duration').text()) / 2);
       var screenshotTime =  Math.floor(parseInt(starttime) / 1000) + 10;
       var hours = Math.floor(screenshotTime / 3600);
@@ -114,6 +137,10 @@ define([
 
     self.getVideos = function() {
       return settings.videos;
+    };
+    
+    self.getChapters = function() {
+    	return settings.chapters;
     };
 
     self.getScreenshot = function() {

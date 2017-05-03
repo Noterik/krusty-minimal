@@ -49,8 +49,9 @@ define([
 					'success': function(data){
 						var parser = QSResponseParser({data:data});
 						var videos = parser.getVideos();
+						var chapters = parser.getChapters();
 						var screenshot = parser.getScreenshot();
-						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket, 'startTime': Number(options.start)});
+						var creator = VideoElementCreator({'videos': videos, 'chapters': chapters, 'quality': options.quality, 'ticket': options.ticket, 'startTime': Number(options.start)});
 						element = creator.create();
 						listenToEvents(self, element);
 						element.width($(self)[0].clientWidth);
@@ -75,7 +76,7 @@ define([
 						playIcon.css('left', ((element.width() / 2) - (playIcon.width() / 2)) + "px");
 						playIcon.css('top', ((element.height() / 2) - (playIcon.height() / 2)) + "px");
 						
-						$("#seek-bar").css('width', ($("#videoplayer").width() - 325) +"px");
+						$("#seek-bar").css('width', ($("#videoplayer").width() - 350) +"px");
 					}
 				});
 			},

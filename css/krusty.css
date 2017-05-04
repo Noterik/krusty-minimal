@@ -102,6 +102,10 @@ video{
 	cursor: pointer;
 }
 
+.subtitles-enabled {
+	color: #f0f0f0;
+}
+
 #mute-unmute {
 	float: right;
 	width: 20px;

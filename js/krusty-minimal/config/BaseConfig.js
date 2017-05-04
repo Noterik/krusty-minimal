@@ -3,7 +3,7 @@ function(){
 
 	var BaseConfig = {}
 	
-	BaseConfig.baseURI = 'http://streaming11.dans.knaw.nl';
+	BaseConfig.baseURI = 'http://dans.noterik.com';
 
 	return BaseConfig;
 });

@@ -1,15 +1,10 @@
 define(['libs/jquery.browser.mobile'], function() {
-  var VideoElementCreator = function(options) {
+  var AudioElementCreator = function(options) {
     var self = {};
     var settings = {
-      'videos': null,
-	  'quality': '360p',
+      'audios': null,
       'currentOrder': null,
       'currentItem': 0,
-      'order': {
-        'mobile': ['360p', '180p', '720p', '1080p'],
-        'desktop': ['720p', '1080p', '720p', '1080p']
-      },
       'ticket': null,
       wasPlaying: false,
       seekTime: -1
@@ -20,22 +15,22 @@ define(['libs/jquery.browser.mobile'], function() {
     $.extend(settings, options);
 
     self.create = function() {
-      var video = $(document.createElement("video"));
-      video.attr('id', 'videoplayer');
+      var audio = $(document.createElement("audio"));
+      audio.attr('id', 'videoplayer');
 
       var source = getWantedSource(settings);
-      var codec = getWantedCodec(source.codecs, "video/mp4");
+      var codec = getWantedCodec(source.codecs, "audio/mp4");
       if (codec.streamSrc !== undefined) {
         var streamSource = $(document.createElement("source"));
         streamSource.attr('src', codec.streamSrc);
         streamSource.attr('type', codec.type);
-        video.append(streamSource);
+        audio.append(streamSource);
       }
 
       source = $(document.createElement("source"));
       source.attr('src', codec.src+getQueryString());
       source.attr('type', codec.type);
-      video.append(source);
+      audio.append(source);
       
       var subtitles = getSubtitles;
       if (subtitles !== undefined) {
@@ -44,33 +39,33 @@ define(['libs/jquery.browser.mobile'], function() {
     	  var track = $(document.createElement("track"));
     	  track.attr('src', subtitles);
           track.attr('kind', 'subtitles');
-          video.append(track);
+          audio.append(track);
       } else {
     	  $("#subtitles").hide();
       }
 
-      video.on('ended', function() {
-    	  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
+      audio.on('ended', function() {
+    	  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
     	  
-    	  loadVideo(video);
+    	  loadAudio(audio);
       });
       
-      $("#seek-bar").attr("max", settings.videos.duration);
+      $("#seek-bar").attr("max", settings.audios.duration);
       $("#playtime").text(formatTime(0));
-      $("#totaltime").text(formatTime(settings.videos.duration/1000));
+      $("#totaltime").text(formatTime(settings.audios.duration/1000));
       
-      video.on('play', function() {
+      audio.on('play', function() {
     	  $("#play-pause > span").addClass("fa-pause");
     	  $("#play-pause > span").removeClass("fa-play");
       });
       
-      video.on('pause', function() {
+      audio.on('pause', function() {
     	  $("#play-pause > span").addClass("fa-play");
     	  $("#play-pause > span").removeClass("fa-pause");
       });
       
-      video.on('timeupdate', function() {    	  
-    	  var correctedTime = (this.currentTime*1000)-settings.videos[settings.currentItem].starttime;
+      audio.on('timeupdate', function() {    	  
+    	  var correctedTime = (this.currentTime*1000)-settings.audios[settings.currentItem].starttime;
     	  if (correctedTime < 0) {
     		  correctedTime = 0;
     	  }
@@ -78,20 +73,20 @@ define(['libs/jquery.browser.mobile'], function() {
     	  $("#playtime").text(formatTime((prevItemsTime/1000)+correctedTime/1000));
     	  $("#seek-bar").val(prevItemsTime+correctedTime);
     	  
-    	  if (settings.videos[settings.currentItem].duration != -1 && correctedTime >= settings.videos[settings.currentItem].duration) {
-    		  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
+    	  if (settings.audios[settings.currentItem].duration != -1 && correctedTime >= settings.audios[settings.currentItem].duration) {
+    		  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
         	  
-    		  loadVideo(video);
+    		  loadAudio(audio);
     	  }
       });
       
-      video[0].addEventListener('volumechange', function() {
-    	  if (video[0].muted == true || video[0].volume == 0) {
+      audio[0].addEventListener('volumechange', function() {
+    	  if (audio[0].muted == true || audio[0].volume == 0) {
     		  $("#mute-unmute > span").addClass("fa-volume-off");
     		  $("#mute-unmute > span").removeClass("fa-volume-up");
     		  $("#mute-unmute > span").removeClass("fa-volume-down");
     	  } else {
-    		  if (video[0].volume < 0.5) {
+    		  if (audio[0].volume < 0.5) {
     			  $("#mute-unmute > span").addClass("fa-volume-down");
         		  $("#mute-unmute > span").removeClass("fa-volume-off");
         		  $("#mute-unmute > span").removeClass("fa-volume-up");
@@ -103,48 +98,48 @@ define(['libs/jquery.browser.mobile'], function() {
     	  }
       });
       
-      video[0].addEventListener('loadedmetadata', function() {
-    	  //check if a seek took place or just a new video from the video playlist was loaded
+      audio[0].addEventListener('loadedmetadata', function() {
+    	  //check if a seek took place or just a new audio from the audio playlist was loaded
     	  if (settings.seekTime != -1) {
-    		  video[0].currentTime = settings.seekTime / 1000;
+    		  audio[0].currentTime = settings.seekTime / 1000;
     		  settings.seekTime = -1;
     	  } else {
-	    	  if (settings.videos[settings.currentItem].starttime != 0) {
-	    		  video[0].currentTime = settings.videos[settings.currentItem].starttime / 1000;
+	    	  if (settings.audios[settings.currentItem].starttime != 0) {
+	    		  audio[0].currentTime = settings.audios[settings.currentItem].starttime / 1000;
 	    	  } 
     	  }
     	  
-    	  //check if video was playing before and not yet playing again, if so play again
-    	  if (settings.wasPlaying && video[0].paused) {
-    		  video[0].play();
+    	  //check if audio was playing before and not yet playing again, if so play again
+    	  if (settings.wasPlaying && audio[0].paused) {
+    		  audio[0].play();
     	  }
-    	  //either video now started playing or was already playing if ordered in the loadvideo, so wasPlaying can be set to false
+    	  //either audio now started playing or was already playing if ordered in the loadaudio, so wasPlaying can be set to false
     	  settings.wasPlaying = false;
       });
       
       $("#play-pause").click(function() {
-    	 if (video[0].paused == true ) {
-    		 video[0].play(); 
+    	 if (audio[0].paused == true ) {
+    		 audio[0].play(); 
     	 } else {
-    		 video[0].pause();
+    		 audio[0].pause();
     	 }
       });
       
       $("#mute-unmute").click(function() {
-    	 if(video[0].muted == true) {
-    		 video[0].muted = false;
+    	 if(audio[0].muted == true) {
+    		 audio[0].muted = false;
     		 $("#volume-bar").val(tempVolume);
     	 } else {
-    		 video[0].muted = true;
+    		 audio[0].muted = true;
     		 tempVolume = $("#volume-bar").val();
     		 $("#volume-bar").val(0);
     	 }
       });
       
       $("#volume-bar").on("change mousemove", function() {
-    	  video[0].volume = $(this).val();
-    	  if ($(this).val() > 0 && video[0].muted == true) {
-    		  video[0].muted = false;
+    	  audio[0].volume = $(this).val();
+    	  if ($(this).val() > 0 && audio[0].muted == true) {
+    		  audio[0].muted = false;
     	  }
       });
       
@@ -152,32 +147,32 @@ define(['libs/jquery.browser.mobile'], function() {
     	  var seektime = $(this).val();
     	  var i = 0;
     	  
-    	  for (var i = 0; i < settings.videos.length; i++) {
-    		  seektime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+    	  for (var i = 0; i < settings.audios.length; i++) {
+    		  seektime  -= settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
     		  if (seektime < 0) {
-    			  //ok, we found the correct video, correct seektime for this video
-    			  seektime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+    			  //ok, we found the correct audio, correct seektime for this audio
+    			  seektime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
     			  
     			  if (settings.currentItem == i) {
     				  //simple, just do a seek
     				  
-    				  //check if we need to correct for the video starttime that is set
-    				  if (settings.videos[settings.currentItem].starttime != 0) {
-    		    		  video[0].currentTime = (settings.videos[settings.currentItem].starttime / 1000) + (seektime / 1000);
+    				  //check if we need to correct for the audio starttime that is set
+    				  if (settings.audios[settings.currentItem].starttime != 0) {
+    		    		  audio[0].currentTime = (settings.audios[settings.currentItem].starttime / 1000) + (seektime / 1000);
     		    	  } else {
-    		    		  video[0].currentTime = seektime / 1000;
+    		    		  audio[0].currentTime = seektime / 1000;
     		    	  }
     				  
-    				  if (settings.wasPlaying && video[0].paused) {
-    		    		  video[0].play();
+    				  if (settings.wasPlaying && audio[0].paused) {
+    		    		  audio[0].play();
     		    	  }
        		    	  settings.wasPlaying = false; 				  
     			  } else {
-    				  //other video has to be loaded
+    				  //other audio has to be loaded
     				  settings.currentItem = i;
-    				  //set global seektime for if the new video is loaded
-    				  settings.seekTime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + seektime : seektime;
-    				  loadVideo(video);
+    				  //set global seektime for if the new audio is loaded
+    				  settings.seekTime = settings.audios[i].starttime != 0 ? settings.audios[settings.currentItem].starttime + seektime : seektime;
+    				  loadAudio(audio);
     			  }
     			  break;
     		  }
@@ -185,9 +180,9 @@ define(['libs/jquery.browser.mobile'], function() {
       });
       
       $("#seek-bar").on("input", function() {
-    	  if (!video[0].paused && !video[0].ended) {
+    	  if (!audio[0].paused && !audio[0].ended) {
     		  settings.wasPlaying = true;
-    		  video[0].pause();
+    		  audio[0].pause();
     	  }
     	  
     	  $("#playtime").text(formatTime($(this).val() / 1000));
@@ -202,8 +197,8 @@ define(['libs/jquery.browser.mobile'], function() {
       });
       
       $(window).on('resize', function() {
-    	  video.width($("#videoplayer").parent().width());
-    	  video.height($("#videoplayer").parent().height());
+    	  audio.width($("#videoplayer").parent().width());
+    	  audio.height($("#videoplayer").parent().height());
     	  
     	  $(".playIcon").css('left', (($("#videoplayer").width() / 2) - ($(".playIcon").width() / 2)) +"px");
     	  $(".playIcon").css('top', (($("#videoplayer").height() / 2) - ($(".playIcon").height() / 2)) +"px");
@@ -211,11 +206,11 @@ define(['libs/jquery.browser.mobile'], function() {
     	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - 325) +"px");
       });
 
-      return video;
+      return audio;
     };
 
     var getWantedSource = function() {
-        currentSource = settings.videos[settings.currentItem].sources[settings.videos[settings.currentItem].sources.length-1];
+        currentSource = settings.audios[settings.currentItem].sources[settings.audios[settings.currentItem].sources.length-1];
         
         return currentSource;
     };
@@ -238,37 +233,37 @@ define(['libs/jquery.browser.mobile'], function() {
     };
     
     var getSubtitles = function() {
-    	return settings.videos[settings.currentItem].subtitles;
+    	return settings.audios[settings.currentItem].subtitles;
     }
     
-    var loadVideo = function(video) {
+    var loadAudio = function(audio) {
     	var s = getWantedSource();
-    	  var codec = getWantedCodec(s.codecs, "video/mp4");
+    	  var codec = getWantedCodec(s.codecs, "audio/mp4");
 
     	  //only continue playing when in a playlist
     	  if (settings.currentItem == 0) {
-    		  video.removeAttr('autoplay');
+    		  audio.removeAttr('autoplay');
     		  prevItemsTime = 0;
     	  } else {
-    		  video.attr('autoplay', 'autoplay');
+    		  audio.attr('autoplay', 'autoplay');
     		  
     		  for (var i = 0; i < settings.currentItem; i++) {
-    			  prevItemsTime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+    			  prevItemsTime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
     		  }
     	  }
     	  
-    	  video.children('source').first().attr('src', codec.src+getQueryString());
+    	  audio.children('source').first().attr('src', codec.src+getQueryString());
     	  
     	  var subtitles = getSubtitles();
     	  if (subtitles != undefined) {
     		  $("#subtitles").show();
     		  
-    		  video.children('track').first().attr('src', subtitles);
+    		  audio.children('track').first().attr('src', subtitles);
     	  } else {
     		  $("#subtitles").hide();
     	  }
     	  
-    	  video.load();
+    	  audio.load();
     };
 
     var initialize = function() {
@@ -283,7 +278,7 @@ define(['libs/jquery.browser.mobile'], function() {
     return self;
   };
 
-  return VideoElementCreator;
+  return AudioElementCreator;
 });
 
 function toggleFullScreen() {
@@ -314,14 +309,14 @@ function toggleFullScreen() {
 	}
 }
 
-function toggleSubtitles(video) {
-	var video = document.getElementById("videoplayer");
+function toggleSubtitles(audio) {
+	var audio = document.getElementById("videoplayer");
 
-	if (video.textTracks[0].mode == "showing") {
-		video.textTracks[0].mode = "hidden";
+	if (audio.textTracks[0].mode == "showing") {
+		audio.textTracks[0].mode = "hidden";
 		$("#subtitles > span").removeClass("subtitles-enabled");
 	} else {
-		video.textTracks[0].mode = "showing";
+		audio.textTracks[0].mode = "showing";
 		$("#subtitles > span").addClass("subtitles-enabled");
 	}
 }

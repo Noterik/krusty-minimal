@@ -5,11 +5,13 @@ requirejs.config({
 define([
 	'libs/springfield/QuickStartConnector',
 	'app/QSResponseParser',
-	'app/VideoElementCreator'
+	'app/VideoElementCreator',
+	'app/AudioElementCreator'
 ], function(
 	QuickstartConnector,
 	QSResponseParser,
-	VideoElementCreator
+	VideoElementCreator,
+	AudioElementCreator
 ){
 	(function( $ ) {
 		var element = null;
@@ -47,10 +49,21 @@ define([
 				var qc = QuickstartConnector({
 					'uri': options.uri,					
 					'success': function(data){
-						var parser = QSResponseParser({data:data});
+						var parser = QSResponseParser({data:data, ticket:options.ticket});
 						var videos = parser.getVideos();
+						var audios = parser.getAudios();
 						var screenshot = parser.getScreenshot();
-						var creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket});
+						
+						if (options.ticket != null) {
+							screenshot = screenshot+"?ticket="+options.ticket;
+						}
+						
+						var creator;
+						if (audios.length > 0) {
+							creator = AudioElementCreator({'audios': audios, 'quality': options.quality, 'ticket': options.ticket});
+						} else {
+							creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket});
+						}
 						element = creator.create();
 						listenToEvents(self, element);
 						element.width($(self)[0].clientWidth);

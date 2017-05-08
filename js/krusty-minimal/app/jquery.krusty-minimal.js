@@ -69,18 +69,24 @@ define([
 						element.width($(self)[0].clientWidth);
 						element.height($(self)[0].clientHeight);
 						bgImage = $(document.createElement("img"));
+						if (audios.length > 0) {
+							bgImage.attr('src', 'img/audio.png');
+						} else {
+							bgImage.attr('src', screenshot);
+						}
 						bgImage.attr('class', 'bgImage');
-						bgImage.attr('src', screenshot);
-						bgImage.attr('width', element[0].clientWidth);
-						bgImage.attr('height', element[0].clientHeight);
+						bgImage.attr('width', $(self)[0].clientWidth);
+						bgImage.attr('height', $(self)[0].clientHeight);
 						playIcon = $(document.createElement("div"));
-						playIcon.attr('class', 'playIcon');
+						playIcon.attr('class', 'playIcon');						
 						playIcon.on('click', function(){
 							element[0].play();
 						});
 						element.on('play', function(){
 							playIcon.hide();
-							bgImage.hide();
+							if (audios.length == 0) {
+								bgImage.hide();
+							}
 						});
 						$(self).append(element);
 						$(self).append(bgImage);

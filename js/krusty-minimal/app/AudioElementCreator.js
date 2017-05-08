@@ -3,7 +3,6 @@ define(['libs/jquery.browser.mobile'], function() {
     var self = {};
     var settings = {
       'audios': null,
-      'currentOrder': null,
       'currentItem': 0,
       'ticket': null,
       wasPlaying: false,
@@ -32,7 +31,7 @@ define(['libs/jquery.browser.mobile'], function() {
       source.attr('type', codec.type);
       audio.append(source);
       
-      var subtitles = getSubtitles;
+      var subtitles = getSubtitles();
       if (subtitles !== undefined) {
     	  $("#subtitles").show();
     	  
@@ -43,6 +42,8 @@ define(['libs/jquery.browser.mobile'], function() {
       } else {
     	  $("#subtitles").hide();
       }
+      
+      $("#fullscreen").hide();
 
       audio.on('ended', function() {
     	  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
@@ -265,15 +266,6 @@ define(['libs/jquery.browser.mobile'], function() {
     	  
     	  audio.load();
     };
-
-    var initialize = function() {
-      settings.currentOrder = settings.order.desktop;
-      if ($.browser.mobile) {
-        settings.currentOrder = settings.order.mobile;
-      }
-    };
-
-    initialize();
 
     return self;
   };

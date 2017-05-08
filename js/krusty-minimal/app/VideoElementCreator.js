@@ -37,8 +37,8 @@ define(['libs/jquery.browser.mobile'], function() {
       source.attr('type', codec.type);
       video.append(source);
       
-      var subtitles = getSubtitles;
-      if (subtitles !== undefined) {
+      var subtitles = getSubtitles();
+      if (subtitles != "") {
     	  $("#subtitles").show();
     	  
     	  var track = $(document.createElement("track"));

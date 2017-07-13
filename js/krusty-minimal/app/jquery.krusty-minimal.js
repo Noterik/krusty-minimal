@@ -52,6 +52,7 @@ define([
 						var parser = QSResponseParser({data:data, ticket:options.ticket});
 						var videos = parser.getVideos();
 						var audios = parser.getAudios();
+						var playMode = parser.getPlayMode();
 						var screenshot = parser.getScreenshot();
 						
 						if (options.ticket != null) {
@@ -60,9 +61,9 @@ define([
 						
 						var creator;
 						if (audios.length > 0) {
-							creator = AudioElementCreator({'audios': audios, 'quality': options.quality, 'ticket': options.ticket});
+							creator = AudioElementCreator({'audios': audios, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode});
 						} else {
-							creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket});
+							creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode});
 						}
 						element = creator.create();
 						listenToEvents(self, element);
@@ -89,12 +90,20 @@ define([
 							}
 						});
 						$(self).append(element);
-						$(self).append(bgImage);
-						$(self).append(playIcon);
+						if (playMode == "continuous") {
+							$(self).append(bgImage);
+							$(self).append(playIcon);
+						} else {
+							$("#menuicon").show();
+							
+							if (audios.length > 0) {
+								$(self).append(bgImage);
+							}
+						}
 						playIcon.css('left', ((element.width() / 2) - (playIcon.width() / 2)) + "px");
 						playIcon.css('top', ((element.height() / 2) - (playIcon.height() / 2)) + "px");
 						
-						$("#seek-bar").css('width', ($("#videoplayer").width() - 345) +"px");
+						$("#seek-bar").css('width', ($("#videoplayer").width() - 365) +"px");
 					}
 				});
 			},

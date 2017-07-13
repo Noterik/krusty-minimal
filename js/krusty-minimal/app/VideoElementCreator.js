@@ -12,7 +12,8 @@ define(['libs/jquery.browser.mobile'], function() {
       },
       'ticket': null,
       wasPlaying: false,
-      seekTime: -1
+      seekTime: -1,
+      playMode: null
     };
     var tempVolume = 0;
     var prevItemsTime = 0;
@@ -37,6 +38,10 @@ define(['libs/jquery.browser.mobile'], function() {
       source.attr('type', codec.type);
       video.append(source);
       
+      if (settings.playMode == "menu") {
+    	  createMenu();
+      }
+      
       var subtitles = getSubtitles();
       if (subtitles != "") {
     	  $("#subtitles").show();
@@ -50,9 +55,13 @@ define(['libs/jquery.browser.mobile'], function() {
       }
 
       video.on('ended', function() {
-    	  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
+    	  if (settings.playMode == "menu") {
+    		  $("#menu").show();
+    	  } else {    	  
+    		  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
     	  
-    	  loadVideo(video);
+    		  loadVideo(video);
+    	  }
       });
       
       $("#seek-bar").attr("max", settings.videos.duration);
@@ -70,18 +79,28 @@ define(['libs/jquery.browser.mobile'], function() {
       });
       
       video.on('timeupdate', function() {    	  
-    	  var correctedTime = (this.currentTime*1000)-settings.videos[settings.currentItem].starttime;
-    	  if (correctedTime < 0) {
-    		  correctedTime = 0;
-    	  }
-    	  
-    	  $("#playtime").text(formatTime((prevItemsTime/1000)+correctedTime/1000));
-    	  $("#seek-bar").val(prevItemsTime+correctedTime);
-    	  
-    	  if (settings.videos[settings.currentItem].duration != -1 && correctedTime >= settings.videos[settings.currentItem].duration) {
-    		  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
-        	  
-    		  loadVideo(video);
+    	  if (settings.playMode == "menu") {
+    		  var correctedTime = (this.currentTime*1000)-settings.videos[settings.currentItem].starttime;
+	    	  if (correctedTime < 0) {
+	    		  correctedTime = 0;
+	    	  }
+    		  
+    		  $("#playtime").text(formatTime(correctedTime/1000));
+	    	  $("#seek-bar").val(correctedTime);    		  
+    	  } else {
+	    	  var correctedTime = (this.currentTime*1000)-settings.videos[settings.currentItem].starttime;
+	    	  if (correctedTime < 0) {
+	    		  correctedTime = 0;
+	    	  }
+	    	  
+	    	  $("#playtime").text(formatTime((prevItemsTime/1000)+correctedTime/1000));
+	    	  $("#seek-bar").val(prevItemsTime+correctedTime);
+	    	  
+	    	  if (settings.videos[settings.currentItem].duration != -1 && correctedTime >= settings.videos[settings.currentItem].duration) {
+	    		  settings.currentItem = settings.currentItem < settings.videos.length-1 ? settings.currentItem+1 : 0;	
+	        	  
+	    		  loadVideo(video);
+	    	  }
     	  }
       });
       
@@ -150,37 +169,52 @@ define(['libs/jquery.browser.mobile'], function() {
       
       $("#seek-bar").on("change", function() {
     	  var seektime = $(this).val();
-    	  var i = 0;
     	  
-    	  for (var i = 0; i < settings.videos.length; i++) {
-    		  seektime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
-    		  if (seektime < 0) {
-    			  //ok, we found the correct video, correct seektime for this video
-    			  seektime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
-    			  
-    			  if (settings.currentItem == i) {
-    				  //simple, just do a seek
-    				  
-    				  //check if we need to correct for the video starttime that is set
-    				  if (settings.videos[settings.currentItem].starttime != 0) {
-    		    		  video[0].currentTime = (settings.videos[settings.currentItem].starttime / 1000) + (seektime / 1000);
-    		    	  } else {
-    		    		  video[0].currentTime = seektime / 1000;
-    		    	  }
-    				  
-    				  if (settings.wasPlaying && video[0].paused) {
-    		    		  video[0].play();
-    		    	  }
-       		    	  settings.wasPlaying = false; 				  
-    			  } else {
-    				  //other video has to be loaded
-    				  settings.currentItem = i;
-    				  //set global seektime for if the new video is loaded
-    				  settings.seekTime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + seektime : seektime;
-    				  loadVideo(video);
-    			  }
-    			  break;
-    		  }
+    	  if (settings.playMode == "menu") {    	  
+    		  //check if we need to correct for the video starttime that is set
+			  if (settings.videos[settings.currentItem].starttime != 0) {
+	    		  video[0].currentTime = (settings.videos[settings.currentItem].starttime / 1000) + (seektime / 1000);
+	    	  } else {
+	    		  video[0].currentTime = seektime / 1000;
+	    	  }
+			  
+			  if (settings.wasPlaying && video[0].paused) {
+	    		  video[0].play();
+	    	  }
+			  settings.wasPlaying = false; 
+    	  } else {	    	  
+	    	  var i = 0;
+	    	  
+	    	  for (var i = 0; i < settings.videos.length; i++) {
+	    		  seektime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+	    		  if (seektime < 0) {
+	    			  //ok, we found the correct video, correct seektime for this video
+	    			  seektime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+	    			  
+	    			  if (settings.currentItem == i) {
+	    				  //simple, just do a seek
+	    				  
+	    				  //check if we need to correct for the video starttime that is set
+	    				  if (settings.videos[settings.currentItem].starttime != 0) {
+	    		    		  video[0].currentTime = (settings.videos[settings.currentItem].starttime / 1000) + (seektime / 1000);
+	    		    	  } else {
+	    		    		  video[0].currentTime = seektime / 1000;
+	    		    	  }
+	    				  
+	    				  if (settings.wasPlaying && video[0].paused) {
+	    		    		  video[0].play();
+	    		    	  }
+	       		    	  settings.wasPlaying = false; 				  
+	    			  } else {
+	    				  //other video has to be loaded
+	    				  settings.currentItem = i;
+	    				  //set global seektime for if the new video is loaded
+	    				  settings.seekTime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + seektime : seektime;
+	    				  loadVideo(video);
+	    			  }
+	    			  break;
+	    		  }
+	    	  }
     	  }
       });
       
@@ -208,8 +242,39 @@ define(['libs/jquery.browser.mobile'], function() {
     	  $(".playIcon").css('left', (($("#videoplayer").width() / 2) - ($(".playIcon").width() / 2)) +"px");
     	  $(".playIcon").css('top', (($("#videoplayer").height() / 2) - ($(".playIcon").height() / 2)) +"px");
     	  
-    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - 325) +"px");
+    	  var w = 325;
+    	  var subtitles = getSubtitles();
+    	  if (subtitles != undefined) {
+    		  w += 20;
+    	  }
+    	  if (settings.playMode == "menu") {
+    		  w += 20;
+    	  }
+
+    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - w) +"px");
       });
+
+		$("body").on('click', '.menuitem', function(event) {      	
+	      	var playlistItem = event.target.id.substr(event.target.id.indexOf("_")+1);
+	  		settings.currentItem = playlistItem;
+	  		
+	  		var d = settings.videos[playlistItem].duration == -1 ? settings.videos[playlistItem].oduration : settings.videos[playlistItem].duration;
+	  		
+	  		$("#seek-bar").attr("max", d - settings.videos[playlistItem].starttime);
+	        $("#playtime").text(formatTime(0));  		
+	  		$("#totaltime").text(formatTime((d-settings.videos[playlistItem].starttime)/1000));
+	  		
+	  		$("#menu").hide();
+	  		
+	  		loadVideo(video);
+	  		video[0].currentTime = 0;
+	  		video[0].play();
+	  	});
+		
+		$("body").on('click', '#menuicon', function() {
+			video[0].pause();
+			$("#menu").show();
+		});
 
       return video;
     };
@@ -277,6 +342,22 @@ define(['libs/jquery.browser.mobile'], function() {
         settings.currentOrder = settings.order.mobile;
       }
     };
+    
+    //create overlay with menu videos
+    var createMenu = function() {
+    	var menu = $(document.createElement("div"));
+        menu.attr('id', 'menu');
+        
+        for (var i = 0; i < settings.videos.length; i++) {
+        	var item = $(document.createElement("div"));
+        	item.attr('id', 'videoitem_'+i);
+        	item.attr('class', 'menuitem');
+        	item.text(settings.videos[i].title);
+        	menu.append(item);
+        }
+        
+        $('body').append(menu);
+    }
 
     initialize();
 

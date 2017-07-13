@@ -22,6 +22,9 @@ define([
     function parseSources() {
       var data = $(settings.data);
        
+      //get playout mode
+      var playMode = !$(data).find('presentation > videoplaylist > properties > play-mode').text() ? "continuous" : $(data).find('presentation > videoplaylist > properties > play-mode').text();
+      
       //Go through all video's in the videoplaylist in the response, and parse them into PlaylistItem objects.
       var playlistVideos = data.find('presentation > videoplaylist').first().find('video');
       var playlistAudios = data.find('presentation > videoplaylist').first().find('audio');
@@ -43,7 +46,8 @@ define([
 		      v.starttime = !$(video).find('starttime').text() ? 0.0 : parseFloat($(video).find('starttime').text()); 
 		      v.duration = !$(video).find('duration').text() ? -1.0 : parseFloat($(video).find('duration').text()); 
 		      v.subtitles = !$(video).find('webvtt').text() ? undefined : BaseConfig.baseURI+'/data'+ referVid.attr('fullid') +"/"+ $(video).find('webvtt').text(); 
-	
+		      v.title = !$(video).find('title').text() ? undefined : $(video).find('title').text(); 
+		      
 	    	  if (settings.ticket != undefined) {
 	    		 v.subtitles = v.subtitles + "?ticket="+options.ticket;
 	    	  } 
@@ -111,7 +115,8 @@ define([
 		      //Starttime and duration set are in ms
 		      a.starttime = !$(audio).find('starttime').text() ? 0.0 : parseFloat($(audio).find('starttime').text()); 
 		      a.duration = !$(audio).find('duration').text() ? -1.0 : parseFloat($(audio).find('duration').text()); 
-		      		      
+		      a.title = !$(audio).find('title').text() ? undefined : $(audio).find('title').text(); 
+		      
 		      a.position = k;
 		      a.sources = [];
 		      
@@ -158,6 +163,7 @@ define([
 	      });
       }
       
+      settings.playMode = playMode;
       settings.videos = videos;
       settings.audios = audios;
     }
@@ -185,6 +191,10 @@ define([
     
     self.getAudios = function() {
     	return settings.audios;
+    }
+    
+    self.getPlayMode = function() {
+    	return settings.playMode;
     }
 
     self.getScreenshot = function() {

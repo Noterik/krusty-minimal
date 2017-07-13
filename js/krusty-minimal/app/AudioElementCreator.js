@@ -6,7 +6,8 @@ define(['libs/jquery.browser.mobile'], function() {
       'currentItem': 0,
       'ticket': null,
       wasPlaying: false,
-      seekTime: -1
+      seekTime: -1,
+      playMode: null
     };
     var tempVolume = 0;
     var prevItemsTime = 0;
@@ -31,6 +32,10 @@ define(['libs/jquery.browser.mobile'], function() {
       source.attr('type', codec.type);
       audio.append(source);
       
+      if (settings.playMode == "menu") {
+    	  createMenu();
+      }
+      
       var subtitles = getSubtitles();
       if (subtitles !== undefined) {
     	  $("#subtitles").show();
@@ -46,9 +51,13 @@ define(['libs/jquery.browser.mobile'], function() {
       $("#fullscreen").hide();
 
       audio.on('ended', function() {
-    	  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
-    	  
-    	  loadAudio(audio);
+    	  if (settings.playMode == "menu") {
+    		  $("#menu").show();
+    	  } else {
+    		  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
+    	  	    	  
+    		  loadAudio(audio);
+    	  }
       });
       
       $("#seek-bar").attr("max", settings.audios.duration);
@@ -66,18 +75,28 @@ define(['libs/jquery.browser.mobile'], function() {
       });
       
       audio.on('timeupdate', function() {    	  
-    	  var correctedTime = (this.currentTime*1000)-settings.audios[settings.currentItem].starttime;
-    	  if (correctedTime < 0) {
-    		  correctedTime = 0;
-    	  }
-    	  
-    	  $("#playtime").text(formatTime((prevItemsTime/1000)+correctedTime/1000));
-    	  $("#seek-bar").val(prevItemsTime+correctedTime);
-    	  
-    	  if (settings.audios[settings.currentItem].duration != -1 && correctedTime >= settings.audios[settings.currentItem].duration) {
-    		  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
-        	  
-    		  loadAudio(audio);
+    	  if (settings.playMode == "menu") {
+    		  var correctedTime = (this.currentTime*1000)-settings.audios[settings.currentItem].starttime;
+	    	  if (correctedTime < 0) {
+	    		  correctedTime = 0;
+	    	  }
+	    	  
+	    	  $("#playtime").text(formatTime(correctedTime/1000));
+	    	  $("#seek-bar").val(correctedTime);
+    	  } else {    	  
+	    	  var correctedTime = (this.currentTime*1000)-settings.audios[settings.currentItem].starttime;
+	    	  if (correctedTime < 0) {
+	    		  correctedTime = 0;
+	    	  }
+	    	  
+	    	  $("#playtime").text(formatTime((prevItemsTime/1000)+correctedTime/1000));
+	    	  $("#seek-bar").val(prevItemsTime+correctedTime);
+	    	  
+	    	  if (settings.audios[settings.currentItem].duration != -1 && correctedTime >= settings.audios[settings.currentItem].duration) {
+	    		  settings.currentItem = settings.currentItem < settings.audios.length-1 ? settings.currentItem+1 : 0;	
+	        	  
+	    		  loadAudio(audio);
+	    	  }
     	  }
       });
       
@@ -146,37 +165,52 @@ define(['libs/jquery.browser.mobile'], function() {
       
       $("#seek-bar").on("change", function() {
     	  var seektime = $(this).val();
-    	  var i = 0;
     	  
-    	  for (var i = 0; i < settings.audios.length; i++) {
-    		  seektime  -= settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
-    		  if (seektime < 0) {
-    			  //ok, we found the correct audio, correct seektime for this audio
-    			  seektime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
-    			  
-    			  if (settings.currentItem == i) {
-    				  //simple, just do a seek
-    				  
-    				  //check if we need to correct for the audio starttime that is set
-    				  if (settings.audios[settings.currentItem].starttime != 0) {
-    		    		  audio[0].currentTime = (settings.audios[settings.currentItem].starttime / 1000) + (seektime / 1000);
-    		    	  } else {
-    		    		  audio[0].currentTime = seektime / 1000;
-    		    	  }
-    				  
-    				  if (settings.wasPlaying && audio[0].paused) {
-    		    		  audio[0].play();
-    		    	  }
-       		    	  settings.wasPlaying = false; 				  
-    			  } else {
-    				  //other audio has to be loaded
-    				  settings.currentItem = i;
-    				  //set global seektime for if the new audio is loaded
-    				  settings.seekTime = settings.audios[i].starttime != 0 ? settings.audios[settings.currentItem].starttime + seektime : seektime;
-    				  loadAudio(audio);
-    			  }
-    			  break;
-    		  }
+    	  if (settings.playMode == "menu") {  
+    		  //check if we need to correct for the audio starttime that is set
+			  if (settings.audios[settings.currentItem].starttime != 0) {
+	    		  audio[0].currentTime = (settings.audios[settings.currentItem].starttime / 1000) + (seektime / 1000);
+	    	  } else {
+	    		  audio[0].currentTime = seektime / 1000;
+	    	  }
+			  
+			  if (settings.wasPlaying && audio[0].paused) {
+	    		  audio[0].play();
+	    	  }
+			  settings.wasPlaying = false; 
+    	  } else {    	  
+	    	  var i = 0;
+	    	  
+	    	  for (var i = 0; i < settings.audios.length; i++) {
+	    		  seektime  -= settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
+	    		  if (seektime < 0) {
+	    			  //ok, we found the correct audio, correct seektime for this audio
+	    			  seektime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
+	    			  
+	    			  if (settings.currentItem == i) {
+	    				  //simple, just do a seek
+	    				  
+	    				  //check if we need to correct for the audio starttime that is set
+	    				  if (settings.audios[settings.currentItem].starttime != 0) {
+	    		    		  audio[0].currentTime = (settings.audios[settings.currentItem].starttime / 1000) + (seektime / 1000);
+	    		    	  } else {
+	    		    		  audio[0].currentTime = seektime / 1000;
+	    		    	  }
+	    				  
+	    				  if (settings.wasPlaying && audio[0].paused) {
+	    		    		  audio[0].play();
+	    		    	  }
+	       		    	  settings.wasPlaying = false; 				  
+	    			  } else {
+	    				  //other audio has to be loaded
+	    				  settings.currentItem = i;
+	    				  //set global seektime for if the new audio is loaded
+	    				  settings.seekTime = settings.audios[i].starttime != 0 ? settings.audios[settings.currentItem].starttime + seektime : seektime;
+	    				  loadAudio(audio);
+	    			  }
+	    			  break;
+	    		  }
+	    	  }
     	  }
       });
       
@@ -204,8 +238,39 @@ define(['libs/jquery.browser.mobile'], function() {
     	  $(".playIcon").css('left', (($("#videoplayer").width() / 2) - ($(".playIcon").width() / 2)) +"px");
     	  $(".playIcon").css('top', (($("#videoplayer").height() / 2) - ($(".playIcon").height() / 2)) +"px");
     	  
-    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - 325) +"px");
+    	  var w = 325;
+    	  var subtitles = getSubtitles();
+    	  if (subtitles != undefined) {
+    		  w += 20;
+    	  }
+    	  if (settings.playMode == "menu") {
+    		  w += 20;
+    	  }
+    	  
+    	  $("#seek-bar").css('width', ($("#videoplayer").parent().width() - w) +"px");
       });
+      
+      $("body").on('click', '.menuitem', function(event) {      	
+	      	var playlistItem = event.target.id.substr(event.target.id.indexOf("_")+1);
+	  		settings.currentItem = playlistItem;
+	  		
+	  		var d = settings.audios[playlistItem].duration == -1 ? settings.audios[playlistItem].oduration : settings.videos[playlistItem].duration;
+	  		
+	  		$("#seek-bar").attr("max", d - settings.audios[playlistItem].starttime);
+	        $("#playtime").text(formatTime(0));  		
+	  		$("#totaltime").text(formatTime((d-settings.audios[playlistItem].starttime)/1000));
+	  		
+	  		$("#menu").hide();
+	  		
+	  		loadAudio(audio);
+	  		audio[0].currentTime = 0;
+	  		audio[0].play();
+	  	});
+		
+		$("body").on('click', '#menuicon', function() {
+			audio[0].pause();
+			$("#menu").show();
+		});
 
       return audio;
     };
@@ -266,6 +331,22 @@ define(['libs/jquery.browser.mobile'], function() {
     	  
     	  audio.load();
     };
+    
+  //create overlay with menu audios
+    var createMenu = function() {
+    	var menu = $(document.createElement("div"));
+        menu.attr('id', 'menu');
+        
+        for (var i = 0; i < settings.audios.length; i++) {
+        	var item = $(document.createElement("div"));
+        	item.attr('id', 'audioitem_'+i);
+        	item.attr('class', 'menuitem');
+        	item.text(settings.audios[i].title);
+        	menu.append(item);
+        }
+        
+        $('body').append(menu);
+    }
 
     return self;
   };

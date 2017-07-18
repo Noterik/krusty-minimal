@@ -43,7 +43,7 @@ define([
       }
       
       var subtitles = getSubtitles();
-      if (subtitles.length > 0) {    	  
+      if (subtitles != undefined && subtitles.length > 0) {    	  
     	  $("#subtitles").show();
     	  
     	  var menuItems  = {};
@@ -291,7 +291,7 @@ define([
     	  
     	  var w = 325;
     	  var subtitles = getSubtitles();
-    	  if (subtitles != undefined) {
+    	  if (subtitles != undefined && subtitles.length > 0) {
     		  w += 20;
     	  }
     	  if (settings.playMode == "menu") {
@@ -372,7 +372,7 @@ define([
     	audio.children('source').first().attr('src', codec.src+getQueryString());
     	  
     	var subtitles = getSubtitles();
-    	if (subtitles.length > 0) {
+    	if (subtitles != undefined && subtitles.length > 0) {
     		jQuery.contextMenu('destroy');
     		
     		audio.children('track').remove();

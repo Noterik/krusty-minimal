@@ -25,6 +25,7 @@
   <!-- CSS concatenated and minified via ant build script-->
   <link rel="stylesheet" href="css/krusty.css">
   <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/jquery.contextMenu.min.css">
   <!-- end CSS-->
 
   <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
@@ -33,9 +34,9 @@
 <body role="main" class="videoplayer">
 	<div id="controls">
 		<div id="play-pause"><span class="fa fa-play fa-lg"></span></div>
-		<div id="fullscreen"><span class="fa fa-expand fa-lg"></span></div>
-		<div id="subtitles"><span class="fa fa-cc fa-lg"></span></div>
-		<div id ="menuicon"><span class="fa fa-bars fa-lg"></span></div>
+		<div id="fullscreen"><span class="fa fa-expand fa-lg" title="fullscreen"></span></div>
+		<div id="subtitles"><span class="subtitles-stack subtitles-crossed-out"><i class="fa fa-lg fa-stack-1x fa-cc" title="subtitles"></i></span></div>
+		<div id ="menuicon"><span class="fa fa-bars fa-lg" title="menu"></span></div>
 		<input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">
 		<div id="mute-unmute"><span class="fa fa-volume-up fa-lg"></span></div>
 		<div id="time">

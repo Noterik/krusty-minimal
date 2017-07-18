@@ -45,13 +45,42 @@ define([
 		      //Starttime and duration set are in ms
 		      v.starttime = !$(video).find('starttime').text() ? 0.0 : parseFloat($(video).find('starttime').text()); 
 		      v.duration = !$(video).find('duration').text() ? -1.0 : parseFloat($(video).find('duration').text()); 
-		      v.subtitles = !$(video).find('webvtt').text() ? undefined : BaseConfig.baseURI+'/data'+ referVid.attr('fullid') +"/"+ $(video).find('webvtt').text(); 
+		      var webvtt = !$(video).find('webvtt').text() ? undefined : BaseConfig.baseURI+'/data'+ referVid.attr('fullid') +"/"+ $(video).find('webvtt').text(); 
 		      v.title = !$(video).find('title').text() ? undefined : $(video).find('title').text(); 
 		      
-	    	  if (settings.ticket != undefined) {
-	    		 v.subtitles = v.subtitles + "?ticket="+options.ticket;
+	    	  if (settings.ticket != undefined && webvtt != undefined) {
+	    		 webvtt = webvtt + "?ticket="+options.ticket;
 	    	  } 
-		      
+	    	  
+	    	  var subtitleObj = [];
+	    	  
+	    	  if (webvtt == undefined) {
+		    	  var multiSubtitles = $(video).find('*').filter(function() {
+		    		 return /^webvtt_/i.test(this.nodeName);
+		    	  });
+
+		    	  for (i = 0; i < multiSubtitles.length; i++) {
+		    		  sObj = {};
+		    		  sObj.language = multiSubtitles[i].tagName.substr(multiSubtitles[i].tagName.indexOf("_")+1);
+		    		  var content = BaseConfig.baseURI+'/data'+ referVid.attr('fullid') +"/"+ multiSubtitles[i].textContent;
+		    		  
+		    		  if (settings.ticket != undefined) {
+		    			  content = content + "?ticket="+options.ticket;
+		 	    	  } 
+		    		  
+		    		  sObj.subtitle = content;
+		    		  subtitleObj.push(sObj);
+		    	  }
+	    	  } else {
+	    		  sObj = {};
+	    		  
+	    		  sObj.language = undefined;
+	    		  sObj.subtitle = webvtt;
+	    		  subtitleObj.push(sObj);
+	    	  }
+	    	  
+	    	  v.subtitles = subtitleObj;
+	    	  
 		      v.position = k;
 		      v.sources = [];
 		      

@@ -107,6 +107,29 @@ video{
 	color: #f0f0f0;
 }
 
+.subtitles-stack {
+	position: relative;
+	display: inline-block;
+	width: 1.33em;
+	height: 1.33em;
+	line-height: 1.33em;
+	vertical-align: middle;
+}
+
+.subtitles-crossed-out:after {
+	content: '|';
+    color: #fff;
+    display: block;
+    text-align: center;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    font-size: 1.66em;
+    padding-left: 0.1em;
+    overflow: hidden;
+}
+
 #mute-unmute {
 	float: right;
 	width: 20px;

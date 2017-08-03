@@ -2,6 +2,7 @@ define([
         'libs/jquery.browser.mobile',
         'libs/contextmenu/jquery.contextMenu.min',
         'libs/contextmenu/jquery.ui.position.min',
+        'libs/jquery.cookie-1.4.1.min',
         ], function() {
   var VideoElementCreator = function(options) {
     var self = {};
@@ -51,9 +52,9 @@ define([
       var subtitles = getSubtitles();
       if (subtitles != undefined && subtitles.length > 0) {    	  
     	  $("#subtitles").show();
-    	  
+
     	  var menuItems  = {};
-    	  
+
     	  for (var i = 0; i < subtitles.length; i++) {    		  
     		  var item = {};
     		  
@@ -65,6 +66,15 @@ define([
             	  item.name = languageArray[subtitles[i].language];
             	  track.attr('srclang', subtitles[i].language);
             	  track.attr('label', languageArray[subtitles[i].language]);
+            	  //check if subtitles is enabled and we are matching
+            	  if ($.cookie("subtitles") == "true" &&  $.cookie("language") == subtitles[i].language) {
+            		  track.attr('default', 'default');
+            		  $("#subtitles > span").addClass("subtitles-enabled");
+    	        	  $("#subtitles > span").removeClass("subtitles-crossed-out");
+    	        	  item.icon = "fa-check";
+    	        	  subtitlesEnabled = true;
+    	        	  subtitleLanguage = subtitles[i].language;
+            	  }
               } else {
             	  
               }             
@@ -73,29 +83,46 @@ define([
     	  }
     	  
     	  var item = {};
-    	  item.name = "Disabled";
+    	  item.name = "Disabled";    	  
+    	  if ($.cookie("subtitles") != "true") {
+    		  item.icon = "fa-check";
+    	  }
     	  menuItems.disabled = item;
     	  
     	  if (subtitles.length > 1) {   		      		  
     		  jQuery.contextMenu({    		  
     			  selector: '#subtitles',
 	              trigger: 'left',
-	              callback: function (key, options) {
-	            	  $(video.prop('textTracks')).prop('mode', function(){
-	            		  return this.language == key ? 'showing' : 'disabled';
-	            	  });
-	    	            
-	    	          if (key == "disabled") {
-	    	        	  $("#subtitles > span").removeClass("subtitles-enabled");
-	    	        	  $("#subtitles > span").addClass("subtitles-crossed-out");
-	    	          } else {
-	    	        	  subtitlesEnabled = true;
-	    	        	  subtitleLanguage = key;
-	    	        	  $("#subtitles > span").addClass("subtitles-enabled");
-	    	        	  $("#subtitles > span").removeClass("subtitles-crossed-out");
-	    	          }
-	              },
-	              items: menuItems
+	              build: function($trigger, e) {
+	            	  return {	              
+			              callback: function (key, options) {			            	  
+			            	  $(video.prop('textTracks')).prop('mode', function(){
+			            		  menuItems[this.language].icon = "";
+			            		  if (this.language == key) {
+			            			  menuItems[this.language].icon = "fa-check";
+			            			  menuItems.disabled.icon = "";
+			            		  }
+			            		  return this.language == key ? 'showing' : 'disabled';	            		  
+			            	  });
+			    	            
+			    	          if (key == "disabled") {
+			    	        	  menuItems.disabled	.icon = "fa-check";
+			            		  $.cookie("subtitles", 'false');
+			            		  subtitlesEnabled = false;
+			    	        	  $("#subtitles > span").removeClass("subtitles-enabled");
+			    	        	  $("#subtitles > span").addClass("subtitles-crossed-out");
+			    	          } else {
+			    	        	  subtitlesEnabled = true;
+			    	        	  subtitleLanguage = key;
+			    	        	  $.cookie("subtitles", 'true');
+		            			  $.cookie("language", key);
+			    	        	  $("#subtitles > span").addClass("subtitles-enabled");
+			    	        	  $("#subtitles > span").removeClass("subtitles-crossed-out");
+			    	          }
+			              },
+			              items: menuItems
+	            	  };
+	              }
     		  });
     	  }
       } else {
@@ -374,18 +401,18 @@ define([
     	}
     	  
     	video.children('source').first().attr('src', codec.src+getQueryString());
-    	  
+    	
     	var subtitles = getSubtitles();
     	if (subtitles != undefined && subtitles.length > 0) {
     		jQuery.contextMenu('destroy');
     		
-    		video.children('track').remove();
+    		$(video.children('track').remove());
     		
     		$("#subtitles").show();
         	  
         	var menuItems  = {};
-        	  
-        	for (var i = 0; i < subtitles.length; i++) {    		  
+        	
+        	for (var i = 0; i < subtitles.length; i++) {        		
         		var item = {};
         		  
         		var track = $(document.createElement("track"));
@@ -399,7 +426,8 @@ define([
                 	
                 	//continue with subtitles in same language as previously selected, if available
                 	if (subtitlesEnabled && subtitleLanguage == subtitles[i].language) {
-                		track.attr('mode', 'showing');
+                		item.icon = "fa-check";
+                		track.attr('default', 'default');
                 	}
                 } else {
                	  
@@ -410,29 +438,58 @@ define([
         	  
         	var item = {};
         	item.name = "Disabled";
+        	if (!subtitlesEnabled) {
+        		item.icon = "fa-check";
+        	}
         	menuItems.disabled = item;
         	  
-        	if (subtitles.length > 1) {   		          		  
+        	if (subtitles.length > 1) {
+        		//workaround for firefox
+        		if (navigator.userAgent.search("Firefox") > -1) {
+	        		$(video.prop('textTracks')).prop('mode', function() {
+	        			return this.language == subtitleLanguage ? 'showing' : 'disabled';	 
+	        		});
+        		}
+        		
         		jQuery.contextMenu({    		  
         			selector: '#subtitles',
     	            trigger: 'left',
-    	            callback: function (key, options) {
-	    	            $(video.prop('textTracks')).prop('mode', function(){
-	    	            	return this.language == key ? 'showing' : 'disabled';
-	    	            });
-	    	            
-	    	            if (key == "disabled") {
-	    	            	$("#subtitles > span").removeClass("subtitles-enabled");
-	    	        		$("#subtitles > span").addClass("subtitles-crossed-out");
-	    	            } else {
-	    	            	subtitlesEnabled = true;
-	    	            	subtitleLanguage = key;
-	    	            	$("#subtitles > span").addClass("subtitles-enabled");
-	    	        		$("#subtitles > span").removeClass("subtitles-crossed-out");
-	    	            }	    	            
-    	            },
-    	            items: menuItems
+    	            build: function($trigger, e) {
+  	            	  return {	              
+  			              callback: function (key, options) {  			            	  
+  			            	  $(video.prop('textTracks')).prop('mode', function(){
+  			            		  menuItems[this.language].icon = "";
+  			            		  if (this.language == key) {
+  			            			  menuItems[this.language].icon = "fa-check";
+  			            			  menuItems.disabled.icon = "";  			            			  
+  			            		  }
+  			            		  return this.language == key ? 'showing' : 'disabled';	            		  
+  			            	  });
+  			    	            
+  			    	          if (key == "disabled") {
+  			    	        	  menuItems.disabled.icon = "fa-check";
+  			    	        	  $.cookie("subtitles", 'false');
+  			    	        	  subtitlesEnabled = false;
+  			    	        	  $("#subtitles > span").removeClass("subtitles-enabled");
+  			    	        	  $("#subtitles > span").addClass("subtitles-crossed-out");
+  			    	          } else {
+  			    	        	  subtitlesEnabled = true;
+  			    	        	  subtitleLanguage = key;
+  			    	        	  $.cookie("subtitles", 'true');
+		            			  $.cookie("language", key);
+  			    	        	  $("#subtitles > span").addClass("subtitles-enabled");
+  			    	        	  $("#subtitles > span").removeClass("subtitles-crossed-out");
+  			    	          }
+  			              },
+  			              items: menuItems
+  	            	  	};
+    	            }
         		});
+        	} else if (subtitles.length == 1){
+        		//workaround due to firefox
+        		if (subtitlesEnabled && navigator.userAgent.search("Firefox") > -1) {
+        			$(video.prop('textTracks')).first().prop('mode', 'showing');
+        		}
         	}
     	} else {
     		jQuery.contextMenu('destroy');
@@ -463,6 +520,24 @@ define([
         }
         
         $('body').append(menu);
+    }
+    
+    var toggleSubtitles = function() {
+    	var video = document.getElementById("videoplayer");
+
+    	if (video.textTracks[0].mode == "showing") {
+    		subtitlesEnabled = false;
+      	  	$.cookie("subtitles", 'false');
+    		video.textTracks[0].mode = "hidden";
+    		$("#subtitles > span").removeClass("subtitles-enabled");
+    		$("#subtitles > span").addClass("subtitles-crossed-out");
+    	} else {
+    		subtitlesEnabled = true;
+    		$.cookie("subtitles", 'true');
+    		video.textTracks[0].mode = "showing";
+    		$("#subtitles > span").removeClass("subtitles-crossed-out");
+    		$("#subtitles > span").addClass("subtitles-enabled");
+    	}
     }
 
     initialize();
@@ -498,22 +573,6 @@ function toggleFullScreen() {
 		}
 		$("#fullscreen > span").addClass("fa-expand");
   	  	$("#fullscreen > span").removeClass("fa-compress");
-	}
-}
-
-function toggleSubtitles(video) {
-	var video = document.getElementById("videoplayer");
-
-	if (video.textTracks[0].mode == "showing") {
-		subtitlesEnabled = false;
-		video.textTracks[0].mode = "hidden";
-		$("#subtitles > span").removeClass("subtitles-enabled");
-		$("#subtitles > span").addClass("subtitles-crossed-out");
-	} else {
-		subtitlesEnabled = true;
-		video.textTracks[0].mode = "showing";
-		$("#subtitles > span").removeClass("subtitles-crossed-out");
-		$("#subtitles > span").addClass("subtitles-enabled");
 	}
 }
 

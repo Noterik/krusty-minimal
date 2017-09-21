@@ -49,7 +49,7 @@ define([
 				var qc = QuickstartConnector({
 					'uri': options.uri,					
 					'success': function(data){
-						var parser = QSResponseParser({data:data, ticket:options.ticket});
+						var parser = QSResponseParser({data:data, ticket:options.ticket, starttime:options.start});
 						var videos = parser.getVideos();
 						var audios = parser.getAudios();
 						var playMode = parser.getPlayMode();
@@ -61,9 +61,9 @@ define([
 						
 						var creator;
 						if (audios.length > 0) {
-							creator = AudioElementCreator({'audios': audios, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode});
+							creator = AudioElementCreator({'audios': audios, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode, 'starttime': options.start});
 						} else {
-							creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode});
+							creator = VideoElementCreator({'videos': videos, 'quality': options.quality, 'ticket': options.ticket, 'playMode': playMode, 'starttime': options.start});
 						}
 						element = creator.create();
 						listenToEvents(self, element);

@@ -16,6 +16,7 @@ define([
         'desktop': ['720p', '1080p', '720p', '1080p']
       },
       'ticket': null,
+      'starttime': 0,
       wasPlaying: false,
       seekTime: -1,
       playMode: null
@@ -31,6 +32,11 @@ define([
       var video = $(document.createElement("video"));
       video.attr('id', 'videoplayer');
 
+      //starttime requested
+      if (settings.starttime > 0) {
+    	  startAtRequestedVideo();
+      }
+      
       var source = getWantedSource(settings);
       var codec = getWantedCodec(source.codecs, "video/mp4");
       if (codec.streamSrc !== undefined) {
@@ -537,6 +543,26 @@ define([
     		video.textTracks[0].mode = "showing";
     		$("#subtitles > span").removeClass("subtitles-crossed-out");
     		$("#subtitles > span").addClass("subtitles-enabled");
+    	}
+    }
+    
+    var startAtRequestedVideo = function() {    	
+    	var starttime = settings.starttime * 1000;
+    	prevItemsTime = 0;
+    	
+    	for (var i = 0; i < settings.videos.length; i++) {
+    		starttime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+    		
+  		  	if (starttime < 0) {
+  		  		//this video has to be loaded
+  		  		settings.currentItem = i;
+  		  		//correct the negative value we got for checking if < 0 for this video by adding back the duration
+  		  		starttime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+  		  		//set global seektime for if the new video is loaded  		  		
+  		  		settings.seekTime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + starttime : starttime;
+  		  	} else {
+  		  		prevItemsTime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+  		  	}
     	}
     }
 

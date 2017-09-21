@@ -8,6 +8,7 @@ define([
     var settings = {
       data: null,
       ticket: null,
+      starttime: 0,
       videos: null,
       audios: null,
       screenshot: null
@@ -129,6 +130,7 @@ define([
 		            //we need the duration to calculate the total duration, duration is in seconds, convert to miliseconds
 		            duration = rawVideo.find('duration').text() !== "" ? parseFloat(rawVideo.find('duration').text()) * 1000 : duration;
 		            v.oduration = duration;
+		            v.referid = $(video).attr('referid');
 		          }
 		        });
 		      }
@@ -198,20 +200,33 @@ define([
     }
 
     function parseScreenshot() {
-      var data = $(settings.data);
-      var video = data.find('presentation > videoplaylist').first().find('video').first();
-      var starttime = !$(video).find('starttime').text() ? 0 : $(video).find('starttime').text(); 
-      var referVid = $(data.find('fsxml > video[fullid|="' + video.attr('referid') + '"]'));
-      var screenshotElement = referVid.find('screens');
-      var uri = screenshotElement.find('properties > uri').text();     
-      uri = uri.replace("http://", "");
-      uri = uri.replace(".noterik.com", BaseConfig.baseURI+"/data");      
-      //var screenshotTime = Math.floor(parseInt(referVid.find('rawvideo[id=1] > properties > duration').text()) / 2);
-      var screenshotTime =  Math.floor(parseInt(starttime) / 1000) + 10;
-      var hours = Math.floor(screenshotTime / 3600);
-      var minutes = Math.floor((screenshotTime % 3600) / 60);
-      var seconds = Math.floor((screenshotTime % 3600) % 60);
-      settings.screenshot = uri + "/h/" + hours + "/m/" + minutes + "/sec" + seconds + ".jpg";      
+    	var starttime = settings.starttime * 1000;
+    	var shottime = 0;
+    	var referid = "";
+    	
+    	for (var i = 0; i < settings.videos.length; i++) {
+    		starttime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+  		  	if (starttime < 0) {
+  		  		referid = settings.videos[i].referid;
+  		  		//correct the negative value we got for checking if < 0 for this video by adding back the duration
+  		  		starttime += settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
+  		  		//set screenshottime and correct for possible starttime of the video itself  		  		
+  		  		shottime = settings.videos[i].starttime != 0 ? settings.videos[settings.currentItem].starttime + starttime : starttime;
+  		  	}
+    	}
+    	 
+    	var data = $(settings.data);
+    	var referVid = $(data.find('fsxml > video[fullid|="' + referid + '"]'));
+    	var screenshotElement = referVid.find('screens');
+    	var uri = screenshotElement.find('properties > uri').text();     
+    	uri = uri.replace("http://", "");
+    	uri = uri.replace(".noterik.com", BaseConfig.baseURI+"/data");      
+    	//var screenshotTime = Math.floor(parseInt(referVid.find('rawvideo[id=1] > properties > duration').text()) / 2);
+    	var screenshotTime =  Math.floor(parseInt(shottime) / 1000) + (shottime == 0 ? 10 : 0);
+    	var hours = Math.floor(screenshotTime / 3600);
+    	var minutes = Math.floor((screenshotTime % 3600) / 60);
+    	var seconds = Math.floor((screenshotTime % 3600) % 60);
+    	settings.screenshot = uri + "/h/" + hours + "/m/" + minutes + "/sec" + seconds + ".jpg";      
     }
 
     self.getVideos = function() {

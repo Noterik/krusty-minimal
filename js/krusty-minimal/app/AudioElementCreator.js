@@ -9,6 +9,7 @@ define([
       'audios': null,
       'currentItem': 0,
       'ticket': null,
+      'starttime': 0,
       wasPlaying: false,
       seekTime: -1,
       playMode: null
@@ -23,6 +24,11 @@ define([
     self.create = function() {
       var audio = $(document.createElement("audio"));
       audio.attr('id', 'videoplayer');
+      
+      //starttime requested
+      if (settings.starttime > 0) {
+    	  startAtRequestedAudio();
+      }
 
       var source = getWantedSource(settings);
       var codec = getWantedCodec(source.codecs, "audio/mp4");
@@ -525,6 +531,24 @@ define([
     		audio.textTracks[0].mode = "showing";
     		$("#subtitles > span").removeClass("subtitles-crossed-out");
     		$("#subtitles > span").addClass("subtitles-enabled");
+    	}
+    }
+    
+    var startAtRequestedAudio = function() {    	
+    	var starttime = settings.starttime * 1000;
+    	
+    	for (var i = 0; i < settings.audios.length; i++) {
+    		starttime  -= settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
+  		  	if (starttime < 0) {
+  		  		//this video has to be loaded
+  		  		settings.currentItem = i;
+  		  		//correct the negative value we got for checking if < 0 for this video by adding back the duration
+  		  		starttime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
+  		  		//set global seektime for if the new video is loaded  		  		
+  		  		settings.seekTime = settings.audios[i].starttime != 0 ? settings.audios[settings.currentItem].starttime + starttime : starttime;
+  		  	} else {
+  		  		prevItemsTime += settings.audios[i].duration == -1 ? settings.audios[i].oduration : settings.audios[i].duration;
+  		  	}
     	}
     }
 

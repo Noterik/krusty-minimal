@@ -31,6 +31,7 @@ body:hover #controls {
 	position: absolute;
 	z-index: 3;
 }
+
 video{
 	background-color: black;
 	position: absolute;
@@ -91,6 +92,44 @@ video{
 	cursor: pointer;
 }
 
+#subtitles {
+	display: none;
+	float: right;
+	width: 20px;
+	padding: 5px;
+}
+
+#subtitles:hover {
+	cursor: pointer;
+}
+
+.subtitles-enabled {
+	color: #f0f0f0;
+}
+
+.subtitles-stack {
+	position: relative;
+	display: inline-block;
+	width: 1.33em;
+	height: 1.33em;
+	line-height: 1.33em;
+	vertical-align: middle;
+}
+
+.subtitles-crossed-out:after {
+	content: '|';
+    color: #fff;
+    display: block;
+    text-align: center;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    font-size: 1.66em;
+    padding-left: 0.1em;
+    overflow: hidden;
+}
+
 #mute-unmute {
 	float: right;
 	width: 20px;
@@ -114,4 +153,35 @@ button:hover {
 	float: right;
 	width: 60px;
 	margin-top: 5px;
+}
+
+#menuicon {
+	display: none;
+	float: right;
+	padding: 5px;
+	width: 20px;
+}
+
+#menuicon:hover {
+	cursor: pointer;
+}
+
+#menu {
+	width: 100vw;
+	height: 100vh;
+	z-index: 4;
+	background-color: #888888;
+	position:absolute;
+	overflow: hidden;
+}
+
+.menuitem {
+	width: 100vw;
+	height: 10vh;
+	color: #fff;
+	font-size: 5vh;
+	background: linear-gradient(#959595, #797979);
+	padding-left: 2vw;
+	cursor: pointer;
+	padding-top: 2vh;
 }

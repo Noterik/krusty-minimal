@@ -551,8 +551,7 @@ define([
     	prevItemsTime = 0;
     	
     	for (var i = 0; i < settings.videos.length; i++) {
-    		starttime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;
-    		
+    		starttime  -= settings.videos[i].duration == -1 ? settings.videos[i].oduration : settings.videos[i].duration;    		
   		  	if (starttime < 0) {
   		  		//this video has to be loaded
   		  		settings.currentItem = i;

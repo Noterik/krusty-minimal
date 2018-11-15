@@ -31,6 +31,7 @@ define([
     self.create = function() {
       var video = $(document.createElement("video"));
       video.attr('id', 'videoplayer');
+      video.attr('playsinline', 'playsinline');
 
       //starttime requested
       if (settings.starttime > 0) {
@@ -203,7 +204,7 @@ define([
     	  }
       });
       
-      video[0].addEventListener('loadedmetadata', function() {
+      video[0].addEventListener('canplay', function() {
     	  //check if a seek took place or just a new video from the video playlist was loaded
     	  if (settings.seekTime != -1) {
     		  video[0].currentTime = settings.seekTime / 1000;

@@ -198,7 +198,7 @@ define([
     	  }
       });
       
-      audio[0].addEventListener('loadedmetadata', function() {
+      audio[0].addEventListener('canplay', function() {
     	  //check if a seek took place or just a new audio from the audio playlist was loaded
     	  if (settings.seekTime != -1) {
     		  audio[0].currentTime = settings.seekTime / 1000;
